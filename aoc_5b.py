@@ -1,5 +1,4 @@
 import collections
-import sys
 from typing import List
 
 
@@ -21,24 +20,17 @@ def find_min_location(filepath: str) -> (int, int):
         seed_range = [int(seed_ranges[i]), int(seed_ranges[i])+int(seed_ranges[i+1])-1]
         seed_boundaries = collections.deque()
         seed_boundaries.append(seed_range)
-        # print("---start---")
-        # print(seed_boundaries)
         for j in range(len(num_ranges)):
             seed_boundaries = find_boundaries(seed_boundaries, num_ranges[j])
-        # print('---end---')
-        # print(seed_boundaries)
         for k in range(len(seed_boundaries)):
             seeds.append(seed_boundaries[k][0])
-    print(seeds)
-    location = find_location(num_ranges, seeds[0])
-    for seed in seeds:
-        location = min(find_location(num_ranges, seed), location)
-    return location
+    return min(seeds)
 
 
 def find_boundaries(seed_boundaries: collections.deque, num_range: List[List[int]]) -> collections.deque:
     curr_boundaries = seed_boundaries
     next_boundaries = []
+    new_boundaries = []
     for i in range(len(num_range)):
         start = num_range[i][1]
         end = num_range[i][1] + num_range[i][2] - 1
@@ -51,31 +43,29 @@ def find_boundaries(seed_boundaries: collections.deque, num_range: List[List[int
                 next_boundaries.append(boundary)
             # within the range
             elif curr_start >= start and curr_end <= end:
-                next_boundaries.append([curr_start+step, curr_end+step])
+                new_boundaries.append([curr_start+step, curr_end+step])
                 # next_boundaries.append([curr_start, curr_end])
             # middle within range
             elif start > curr_start and end < curr_end:
                 next_boundaries.append([curr_start, start-1])
-                next_boundaries.append([start+step, end+step])
+                new_boundaries.append([start+step, end+step])
                 # next_boundaries.append([start, end])
                 next_boundaries.append([end+1, curr_end])
             # right half within range
             elif start > curr_start and curr_end <= end:
                 next_boundaries.append([curr_start, start-1])
-                next_boundaries.append([start+step, curr_end+step])
+                new_boundaries.append([start+step, curr_end+step])
                 # next_boundaries.append([start, curr_end])
-        # left half within range
+            # left half within range
             elif start <= curr_start and end < curr_end:
-                next_boundaries.append([curr_start+step, end+step])
+                new_boundaries.append([curr_start+step, end+step])
                 # next_boundaries.append([curr_start, end])
                 next_boundaries.append([end+1, curr_end])
-        # print("current")
-        # print(curr_boundaries)
-        # print("next")
-        # print(next_boundaries)
         curr_boundaries = next_boundaries
         next_boundaries = []
-    return curr_boundaries
+    if len(curr_boundaries) > 0:
+        new_boundaries.extend(curr_boundaries)
+    return new_boundaries
 
 
 def find_location(num_ranges: List[List[int]], seed: int) -> int:
