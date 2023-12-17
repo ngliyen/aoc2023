@@ -27,8 +27,10 @@ def pipe_distance(filepath: str) -> int:
         if start_found:
             break
 
+
     loop_found = False
     for p in pipe_map.keys():
+        print("Start", p)
         p1 = start
         pipes[p1[0]][p1[1]] = p
         visited = [[0]*len(pipes[0]) for i in range(len(pipes))]
@@ -50,7 +52,9 @@ def pipe_distance(filepath: str) -> int:
                         connected = True
                         p1 = p2
                         break
+        print(pipes[start[0]][start[1]])
         if loop_found:
+            print(p)
             return count//2 + count%2
     return -1
 
